@@ -1,0 +1,50 @@
+#!/bin/bash
+
+FILE_WITH_ALPHABET=/usr/share/morse_thinglight/alphabet
+DASH_DURATION=0.3
+DOT_DURATION=0.1
+TIME_INTERVAL_BETWEEN_DOTS_AND_DASHES=0.3
+TIME_INTERVAL_BETWEEN_LETTERS=1
+
+thinklight_on(){
+echo 1 > /sys/class/leds/tpacpi\:\:thinklight/brightness
+}
+thinklight_off(){
+
+echo 0 > /sys/class/leds/tpacpi\:\:thinklight/brightness
+
+}
+dash_thinklight(){
+
+thinklight_on
+sleep $DASH_DURATION
+thinklight_off
+sleep $TIME_INTERVAL_BETWEEN_DOTS_AND_DASHES
+}
+
+dot_thinklight(){
+
+thinklight_on
+sleep $DOT_DURATION
+thinklight_off
+sleep $TIME_INTERVAL_BETWEEN_DOTS_AND_DASHES
+}
+
+for i in $(echo $@ | sed 's/\(.\)/ \1/g' )
+do
+	for j in $(cat $FILE_WITH_ALPHABET| grep $i|awk '{ print $2,$3,$4,$5,$6,$7,$8 }')
+		do
+			echo $j
+			if [[ $j='-' ]]
+				then	
+					dash_thinklight
+			elif [[ $j='.' ]]
+				then
+					dot_thinklight
+					
+			fi
+		done
+sleep $INTERVAL_BETWEEN_LETTERS
+done
+
+
